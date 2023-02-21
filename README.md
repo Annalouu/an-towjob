@@ -2,14 +2,14 @@
 Towing Job For QB-Core
 
 # Video
-- 
+- https://youtu.be/XChrYQYJiuo
 
 # Feats
 
 - All interactions has been moved to be integrated inside the script.
 - Utilize of qb-target/ox_target (you don't have to change nothing)
 - Much simplier and everything is in the Config.
-- Added a slamtruck to the existing towtruck
+- Added a slamtruck to the existing flatbed
 
 # Installation 
 

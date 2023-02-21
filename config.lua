@@ -1,7 +1,7 @@
 Config = {}
 
 Config.BailPrice = 100
-Config.dropprice = math.random(1000,2000) -- Your payment between from 1000$ to 2000$ you can change it.
+Config.dropprice = math.random(1000,2000) -- Price of each dropoff
 Config.fuel = 'cdn-fuel'
 Config.Vehicles = {
     ["flatbed"] = "Flatbed",

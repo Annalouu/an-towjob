@@ -37,7 +37,21 @@ end)
 RegisterNetEvent('qb-tow:server:11101110', function(drops)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
-    local payment = Config.payment
+    drops = tonumber(drops)
+    local bonus = 0
+    local DropPrice = Config.dropprice
+    if drops > 5 then
+        bonus = math.ceil((DropPrice / 10) * 5)
+    elseif drops > 10 then
+        bonus = math.ceil((DropPrice / 10) * 7)
+    elseif drops > 15 then
+        bonus = math.ceil((DropPrice / 10) * 10)
+    elseif drops > 20 then
+        bonus = math.ceil((DropPrice / 10) * 12)
+    end
+    local price = (DropPrice * drops) + bonus
+    local payment = price 
+
     Player.Functions.AddJobReputation(1)
     Player.Functions.AddMoney("bank", payment, "tow-salary")
     TriggerClientEvent('QBCore:Notify', src, 'You Got paid $'..payment..' for your service', 'success')

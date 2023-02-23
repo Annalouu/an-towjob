@@ -32,14 +32,14 @@ CreateThread(function()
         options = {
             {
                 type = "client",
-                event = "qb-tow:takeoutcar",
+                event = "an-tow:takeoutcar",
                 icon = "fas fa-circle",
                 label = "Take out the Flatbed",
                 job = "tow"
         },
         {
                 type = "client",
-                event = "qb-tow:parkcar",
+                event = "an-tow:parkcar",
                 icon = "fas fa-circle",
                 label = "Store the flatbed",
                 job = "tow"
@@ -57,7 +57,7 @@ CreateThread(function()
         options = {
             {
                 type = "client",
-					event = "qb-tow:pay",
+					event = "an-tow:pay",
 					icon = "fas fa-circle",
 					label = "Collect Payslip",
 					job = "tow"
@@ -200,7 +200,7 @@ local function MenuGarage()
         towMenu[#towMenu+1] = {
             header = Config.Vehicles[k],
             params = {
-                event = "qb-tow:client:TakeOutVehicle",
+                event = "an-tow:client:TakeOutVehicle",
                 args = {
                     vehicle = k
                 }
@@ -225,7 +225,7 @@ end
 
 -- Events
 
-RegisterNetEvent('qb-tow:client:SpawnVehicle', function()
+RegisterNetEvent('an-tow:client:SpawnVehicle', function()
     local vehicleInfo = selectedVeh
     local coords = Config.Locations["vehicle"].coords
     QBCore.Functions.SpawnVehicle(vehicleInfo, function(veh)
@@ -331,7 +331,7 @@ RegisterNetEvent('jobs:client:ToggleNpc', function()
 end)
 
 
-RegisterNetEvent('qb-tow:client:TowVehicle', function()
+RegisterNetEvent('an-tow:client:TowVehicle', function()
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
     if isTowVehicle(vehicle) then
         if CurrentTow == nil then
@@ -388,7 +388,7 @@ RegisterNetEvent('qb-tow:client:TowVehicle', function()
                                     SetBlipRouteColour(CurrentBlip2, 3)
                                     local chance = math.random(1,100)
                                     if chance < 26 then
-                                        TriggerServerEvent('qb-tow:server:nano')
+                                        TriggerServerEvent('an-tow:server:nano')
                                     end
                                 end
                                 QBCore.Functions.Notify("Vehicle Towed")
@@ -444,17 +444,17 @@ RegisterNetEvent('qb-tow:client:TowVehicle', function()
     end
 end)
 
-RegisterNetEvent('qb-tow:client:TakeOutVehicle', function(data)
+RegisterNetEvent('an-tow:client:TakeOutVehicle', function(data)
     local coords = Config.Locations["vehicle"].coords
     coords = vector3(coords.x, coords.y, coords.z)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
         local vehicleInfo = data.vehicle
-        TriggerServerEvent('qb-tow:server:DoBail', true, vehicleInfo)
+        TriggerServerEvent('an-tow:server:DoBail', true, vehicleInfo)
         selectedVeh = vehicleInfo
 end)
 
-RegisterNetEvent('qb-tow:client:SelectVehicle', function()
+RegisterNetEvent('an-tow:client:SelectVehicle', function()
     local coords = Config.Locations["vehicle"].coords
     coords = vector3(coords.x, coords.y, coords.z)
     local ped = PlayerPedId()
@@ -500,12 +500,12 @@ function RunWorkThread()
     end
 end
 
-RegisterNetEvent("qb-tow:pay")
-AddEventHandler("qb-tow:pay", function()
+RegisterNetEvent("an-tow:pay")
+AddEventHandler("an-tow:pay", function()
 
     if JobsDone > 0 then
     RemoveBlip(CurrentBlip)
-    TriggerServerEvent("qb-tow:server:11101110", JobsDone)
+    TriggerServerEvent("an-tow:server:11101110", JobsDone)
     JobsDone = 0
     NpcOn = false
     else
@@ -513,13 +513,13 @@ AddEventHandler("qb-tow:pay", function()
     end
 end)
 
-RegisterNetEvent("qb-tow:takeoutcar")
-AddEventHandler("qb-tow:takeoutcar", function()
+RegisterNetEvent("an-tow:takeoutcar")
+AddEventHandler("an-tow:takeoutcar", function()
     MenuGarage()
 end)
 
-RegisterNetEvent("qb-tow:parkcar")
-AddEventHandler("qb-tow:parkcar", function()
+RegisterNetEvent("an-tow:parkcar")
+AddEventHandler("an-tow:parkcar", function()
     local coords = vector3(-209.43, -1169.82, 23.04)
     local closestVehicle, distance = QBCore.Functions.GetClosestVehicle(coords)
     if distance < 40 then -- distance limiter to make sure it's close enough change as you wish
@@ -529,7 +529,7 @@ AddEventHandler("qb-tow:parkcar", function()
             QBCore.Functions.Notify("Vehicle is stored.", "success")
             NetworkRequestControlOfEntity(closestVehicle) -- network entity ownership check before deletion
             QBCore.Functions.DeleteVehicle(closestVehicle)
-            TriggerServerEvent('qb-tow:server:DoBail', false)
+            TriggerServerEvent('an-tow:server:DoBail', false)
         else
             print("closest vehicle was not the delivery truck")
             QBCore.Functions.Notify("closest vehicle was not the delivery truck", "error")
@@ -554,7 +554,7 @@ CreateThread(function()
                     if GetEntityModel(oldtruck) == flatbed or GetEntityModel(oldtruck) == slamtruck then return true end
                         return false
                 end,
-                event = "qb-tow:client:TowVehicle",
+                event = "an-tow:client:TowVehicle",
                 job = {
                     ["tow"] = 0,
                     ["mechanic"] = 0,

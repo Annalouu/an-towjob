@@ -2,7 +2,7 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local PaymentTax = 15
 local Bail = {}
 
-RegisterNetEvent('qb-tow:server:DoBail', function(bool, vehInfo)
+RegisterNetEvent('an-tow:server:DoBail', function(bool, vehInfo)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if bool then
@@ -10,12 +10,12 @@ RegisterNetEvent('qb-tow:server:DoBail', function(bool, vehInfo)
             Bail[Player.PlayerData.citizenid] = Config.BailPrice
             Player.Functions.RemoveMoney('cash', Config.BailPrice, "tow-paid-bail")
             TriggerClientEvent('QBCore:Notify', src, 'You Have The Deposit of $'..Config.BailPrice..',- paid', 'success')
-            TriggerClientEvent('qb-tow:client:SpawnVehicle', src, vehInfo)
+            TriggerClientEvent('an-tow:client:SpawnVehicle', src, vehInfo)
         elseif Player.PlayerData.money.bank >= Config.BailPrice then
             Bail[Player.PlayerData.citizenid] = Config.BailPrice
             Player.Functions.RemoveMoney('bank', Config.BailPrice, "tow-paid-bail")
             TriggerClientEvent('QBCore:Notify', src, 'You Have Paid The Deposit Of $'..Config.BailPrice..' Paid', 'success')
-            TriggerClientEvent('qb-tow:client:SpawnVehicle', src, vehInfo)
+            TriggerClientEvent('an-tow:client:SpawnVehicle', src, vehInfo)
         else
             TriggerClientEvent('QBCore:Notify', src, 'Note Enough Money, The Deposit Is $'..Config.BailPrice..'', 'error')
         end
@@ -28,13 +28,13 @@ RegisterNetEvent('qb-tow:server:DoBail', function(bool, vehInfo)
     end
 end)
 
-RegisterNetEvent('qb-tow:server:nano', function()
+RegisterNetEvent('an-tow:server:nano', function()
     local xPlayer = QBCore.Functions.GetPlayer(tonumber(source))
 	xPlayer.Functions.AddItem("cryptostick", 1, false)
 	TriggerClientEvent('inventory:client:ItemBox', source, QBCore.Shared.Items["cryptostick"], "add")
 end)
 
-RegisterNetEvent('qb-tow:server:11101110', function(drops)
+RegisterNetEvent('an-tow:server:11101110', function(drops)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     drops = tonumber(drops)

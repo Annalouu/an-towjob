@@ -9,6 +9,7 @@ local VehicleSpawned = false
 local selectedVeh = nil
 local ranWorkThread = false
 local towable = false
+local towout = false
 
 -- Functions
 
@@ -35,6 +36,9 @@ CreateThread(function()
                 event = "an-tow:takeoutcar",
                 icon = "fas fa-circle",
                 label = "Take out the Flatbed",
+                canInteract = function()
+                    return not towout
+                end,
                 job = "tow"
         },
         {
@@ -42,6 +46,9 @@ CreateThread(function()
                 event = "an-tow:parkcar",
                 icon = "fas fa-circle",
                 label = "Store the flatbed",
+                canInteract = function()
+                    return towout
+                end,
                 job = "tow"
         },
         },
@@ -67,6 +74,44 @@ CreateThread(function()
     })
 end)
 
+
+
+function sendemail(sent)
+    local email = sent
+    if Config.Phone == 'qb' then 
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
+            sender = "Floyd",
+            subject = "Tow Job",
+            message = email,
+        })
+    elseif Config.Phone == 'gks' then
+        TriggerServerEvent('gksphone:NewMail', {
+            sender = "Floyd",
+            image = '/html/static/img/icons/mail.png',
+            subject = 'Tow Job',
+            message = email,
+        })
+    elseif Config.Phone == 'qs' then
+        TriggerServerEvent('qs-smartphone:server:sendNewMail', {
+            sender = 'Floyd',
+            subject = 'Tow Job',
+            message = email,
+            button = {}
+        })
+    end
+end
+
+function sendpopups(sent)
+    local popup = sent
+    if Config.Phone == 'qb' then
+        TriggerEvent('qb-phone:client:CustomNotification','Tow', popup, 'fas fa-location-arrow', '#FF0000', 5500)
+    elseif Config.Phone == 'gks' then
+        TriggerEvent('gksphone:notifi', {title = "CURRENT TASK", message = popup, img= '/html/static/img/icons/messages.png'})
+    elseif Config.Phone == 'qs' then
+        TriggerEvent('qs-smartphone:client:notify', {title = 'CURRENT TASK', text = popup, icon = './img/apps/whatsapp.png', timeout = 4000})
+    end
+end
+
 AddEventHandler('onResourceStop', function(resource)
     if resource == GetCurrentResourceName() then
             DeleteEntity(towped)
@@ -80,22 +125,20 @@ AddEventHandler('onResourceStart', function(resourceName)
     end 
 end)
 
-local function deliverVehicle(vehicle)
-
+function deliverVehicle(vehicle)
     DeleteVehicle(vehicle)
     RemoveBlip(CurrentBlip2)
     JobsDone = JobsDone + 1
     VehicleSpawned = false
-    QBCore.Functions.Notify("You Have Delivered A Vehicle", "success")
-    QBCore.Functions.Notify("A New Vehicle Can Be Picked Up")
+end
 
+function getnewvehicle()
     local randomLocation = getRandomVehicleLocation()
     CurrentLocation.x = Config.Locations["towspots"][randomLocation].coords.x
     CurrentLocation.y = Config.Locations["towspots"][randomLocation].coords.y
     CurrentLocation.z = Config.Locations["towspots"][randomLocation].coords.z
     CurrentLocation.model = Config.Locations["towspots"][randomLocation].model
     CurrentLocation.id = randomLocation
-
     CurrentBlip = AddBlipForCoord(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)
     SetBlipColour(CurrentBlip, 3)
     SetBlipRoute(CurrentBlip, true)
@@ -308,6 +351,7 @@ RegisterNetEvent('jobs:client:ToggleNpc', function()
         end
         NpcOn = not NpcOn
         if NpcOn then
+            sendpopups("Someone called for a tow, go to the location.")
             local randomLocation = getRandomVehicleLocation()
             CurrentLocation.x = Config.Locations["towspots"][randomLocation].coords.x
             CurrentLocation.y = Config.Locations["towspots"][randomLocation].coords.y
@@ -367,6 +411,7 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                 flags = 16,
                             }, {}, {}, function() -- Done
                                 StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
+                                sendpopups("Take the vehicle to the impoundlot.")
                                 local bone = GetEntityBoneIndexByName(vehicle, 'bodyshell')
                             if  modelName == 'SLAMTRUCK' then
                                 AttachEntityToEntity(targetVehicle, vehicle, GetEntityBoneIndexByName(vehicle, 'bodyshell'), 0.0, -0.90 + -0.85, -0.4 + 1.15, 0, 0, 0, 1, 1, 0, 1, 0, 1)
@@ -430,10 +475,14 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
 
                     if #(targetPos - vector3(-238.66, -1177.61, 23.04)) < 25.0 then                      
                             deliverVehicle(CurrentTow)
+                            sendpopups("You Have Delivered A Vehicle, Standby.")
                         end
                     end
                     CurrentTow = nil
                     QBCore.Functions.Notify("Vehicle Taken Off")
+                    Wait(Config.waitbetweenjobs * 1000)
+                    sendpopups("A New Vehicle Can Be Picked Up")
+                    getnewvehicle()
                 end, function() -- Cancel
                     StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
                     QBCore.Functions.Notify("Failed", "error")
@@ -449,6 +498,7 @@ RegisterNetEvent('an-tow:client:TakeOutVehicle', function(data)
     coords = vector3(coords.x, coords.y, coords.z)
     local ped = PlayerPedId()
     local pos = GetEntityCoords(ped)
+    towout = true
         local vehicleInfo = data.vehicle
         TriggerServerEvent('an-tow:server:DoBail', true, vehicleInfo)
         selectedVeh = vehicleInfo
@@ -500,9 +550,14 @@ function RunWorkThread()
     end
 end
 
+RegisterNetEvent('an-tow:client:sendemail', function(messagesent)
+    paymentmsg = messagesent
+    Wait(100)
+    sendemail(paymentmsg)
+end)
+
 RegisterNetEvent("an-tow:pay")
 AddEventHandler("an-tow:pay", function()
-
     if JobsDone > 0 then
     RemoveBlip(CurrentBlip)
     TriggerServerEvent("an-tow:server:11101110", JobsDone)
@@ -526,6 +581,7 @@ AddEventHandler("an-tow:parkcar", function()
         local isTruck = isTowVehicle(closestVehicle) -- uses existing function so will work as normal
         if isTruck then
             print("Deleting vehicle")
+            towout = false
             QBCore.Functions.Notify("Vehicle is stored.", "success")
             NetworkRequestControlOfEntity(closestVehicle) -- network entity ownership check before deletion
             QBCore.Functions.DeleteVehicle(closestVehicle)

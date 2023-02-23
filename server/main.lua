@@ -54,7 +54,8 @@ RegisterNetEvent('an-tow:server:11101110', function(drops)
 
     Player.Functions.AddJobReputation(1)
     Player.Functions.AddMoney("bank", payment, "tow-salary")
-    TriggerClientEvent('QBCore:Notify', src, 'You Got paid $'..payment..' for your service', 'success')
+    TriggerClientEvent('an-tow:client:sendemail', src, 'You Got paid $'..payment..' thank you for your service')
+    
 end)
 
 QBCore.Commands.Add("npc", "Toggle Npc Job", {}, false, function(source, args)

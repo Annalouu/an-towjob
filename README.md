@@ -11,6 +11,7 @@
 - Utilize of qb-target/ox_target (you don't have to change nothing)
 - Much simplier and everything is in the Config.
 - Added a slamtruck to the existing flatbed
+- Added support for qb/gks/qs phones (notifications/emails)
 
 # Installation 
 
@@ -22,6 +23,7 @@
 # dependency 
 - qb-core
 - qb-target
+- qb/qs/gks phone
 - cdn-fuel/ps-fuel/LegacyFuel (in the config)
 
 # Questions:

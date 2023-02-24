@@ -28,11 +28,16 @@ RegisterNetEvent('an-tow:server:DoBail', function(bool, vehInfo)
     end
 end)
 
-RegisterNetEvent('an-tow:server:giveitem', function(item,amount)
+RegisterNetEvent('an-tow:server:giveitem', function(item,amount,bool)
     local src = source
     local xPlayer = QBCore.Functions.GetPlayer(src)
-        xPlayer.Functions.AddItem(item, amount, false)
-        TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "add")
+    local chance = math.random(1,100)
+    if bool then
+        if chance < 26 then
+            xPlayer.Functions.AddItem(item, amount, false)
+            TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[item], "add")
+        end
+    end
 end)
 
 RegisterNetEvent('an-tow:server:getpaid', function(drops)

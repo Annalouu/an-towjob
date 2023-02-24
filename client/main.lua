@@ -10,6 +10,7 @@ local selectedVeh = nil
 local ranWorkThread = false
 local towable = false
 local towout = false
+local cryptostick = false
 
 -- Functions
 
@@ -425,16 +426,16 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                 CurrentTow = targetVehicle
                                 
                                 if NpcOn then
+                                    local item = "cryptostick"
                                     RemoveBlip(CurrentBlip)
                                     QBCore.Functions.Notify("Take The Vehicle To Hayes Depot", "success", 5000)
                                     CurrentBlip2 = AddBlipForCoord(-238.66, -1177.61, 23.04)
                                     SetBlipColour(CurrentBlip2, 3)
                                     SetBlipRoute(CurrentBlip2, true)
                                     SetBlipRouteColour(CurrentBlip2, 3)
-                                    local chance = math.random(1,100)
-                                    if chance < 26 then
-                                        local item = "cryptostick"
-                                        TriggerServerEvent('an-tow:server:giveitem', item, 1)
+                                    cryptostick = true
+                                    TriggerServerEvent('an-tow:server:giveitem', item, 1, cryptostick)
+                                    cryptostick = false
                                     end
                                 end
                                 QBCore.Functions.Notify("Vehicle Towed")

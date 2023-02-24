@@ -437,7 +437,6 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                     Wait(100)
                                     TriggerServerEvent('an-tow:server:giveitem', item, 1, cryptostick)
                                     cryptostick = false
-                                    end
                                 end
                                 QBCore.Functions.Notify("Vehicle Towed")
                             end, function() -- Cancel

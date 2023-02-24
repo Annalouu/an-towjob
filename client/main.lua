@@ -433,7 +433,8 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                     SetBlipRouteColour(CurrentBlip2, 3)
                                     local chance = math.random(1,100)
                                     if chance < 26 then
-                                        TriggerServerEvent('an-tow:server:cryptostick', chance)
+                                        local item = "cryptostick"
+                                        TriggerServerEvent('an-tow:server:giveitem', item, 1)
                                     end
                                 end
                                 QBCore.Functions.Notify("Vehicle Towed")

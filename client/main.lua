@@ -433,7 +433,7 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                     SetBlipRouteColour(CurrentBlip2, 3)
                                     local chance = math.random(1,100)
                                     if chance < 26 then
-                                        TriggerServerEvent('an-tow:server:nano')
+                                        TriggerServerEvent('an-tow:server:cryptostick', chance)
                                     end
                                 end
                                 QBCore.Functions.Notify("Vehicle Towed")
@@ -560,7 +560,7 @@ RegisterNetEvent("an-tow:pay")
 AddEventHandler("an-tow:pay", function()
     if JobsDone > 0 then
     RemoveBlip(CurrentBlip)
-    TriggerServerEvent("an-tow:server:11101110", JobsDone)
+    TriggerServerEvent("an-tow:server:getpaid", JobsDone)
     JobsDone = 0
     NpcOn = false
     else

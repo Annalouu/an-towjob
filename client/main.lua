@@ -434,6 +434,7 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                     SetBlipRoute(CurrentBlip2, true)
                                     SetBlipRouteColour(CurrentBlip2, 3)
                                     cryptostick = true
+                                    Wait(100)
                                     TriggerServerEvent('an-tow:server:giveitem', item, 1, cryptostick)
                                     cryptostick = false
                                     end

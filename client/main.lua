@@ -122,7 +122,7 @@ end)
 
 AddEventHandler('onResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
-        
+        PlayerJob = QBCore.Functions.GetPlayerData().job
     end 
 end)
 

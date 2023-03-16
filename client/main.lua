@@ -11,6 +11,7 @@ local ranWorkThread = false
 local towable = false
 local towout = false
 local cryptostick = false
+local JobCode = Config.Job
 
 -- Functions
 
@@ -30,49 +31,89 @@ CreateThread(function()
     FreezeEntityPosition(towped, true)
     SetEntityInvincible(towped, true)
     SetBlockingOfNonTemporaryEvents(towped, true)
-    exports['qb-target']:AddTargetEntity(towped, {
-        options = {
+    if Config.RequireJob then
+        exports['qb-target']:AddTargetEntity(towped, {
+            options = {
+                {
+                    type = "client",
+                    event = "an-tow:takeoutcar",
+                    icon = "fas fa-circle",
+                    label = "Take out the Flatbed",
+                    canInteract = function()
+                        return not towout
+                    end,
+                    job = JobCode
+            },
             {
-                type = "client",
-                event = "an-tow:takeoutcar",
-                icon = "fas fa-circle",
-                label = "Take out the Flatbed",
-                canInteract = function()
-                    return not towout
-                end,
-                job = "tow"
-        },
-        {
-                type = "client",
-                event = "an-tow:parkcar",
-                icon = "fas fa-circle",
-                label = "Store the flatbed",
-                canInteract = function()
-                    return towout
-                end,
-                job = "tow"
-        },
-        },
-        distance = 2.0
-    })
+                    type = "client",
+                    event = "an-tow:parkcar",
+                    icon = "fas fa-circle",
+                    label = "Store the flatbed",
+                    canInteract = function()
+                        return towout
+                    end,
+                    job = JobCode
+            },
+            },
+            distance = 2.0
+        })
+    else
+        exports['qb-target']:AddTargetEntity(towped, {
+            options = {
+                {
+                    type = "client",
+                    event = "an-tow:takeoutcar",
+                    icon = "fas fa-circle",
+                    label = "Take out the Flatbed",
+                    canInteract = function()
+                        return not towout
+                    end
+            },
+            {
+                    type = "client",
+                    event = "an-tow:parkcar",
+                    icon = "fas fa-circle",
+                    label = "Store the flatbed",
+                    canInteract = function()
+                        return towout
+                    end
+            },
+            },
+            distance = 2.0
+        })
+    end
     QBCore.Functions.LoadModel(Config.payPedHash)
     payped = CreatePed(0, Config.payPedHash, Config.payPedPos.x, Config.payPedPos.y, Config.payPedPos.z-1.0, Config.payPedPos.w, false, false)
     TaskStartScenarioInPlace(payped,  true)
     FreezeEntityPosition(payped, true)
     SetEntityInvincible(payped, true)
     SetBlockingOfNonTemporaryEvents(payped, true)
-    exports['qb-target']:AddTargetEntity(payped, {
-        options = {
-            {
-                type = "client",
-					event = "an-tow:pay",
-					icon = "fas fa-circle",
-					label = "Collect Payslip",
-					job = "tow"
-        },
-        },
-        distance = 2.0
-    })
+    if Config.RequireJob then
+        exports['qb-target']:AddTargetEntity(payped, {
+            options = {
+                {
+                    type = "client",
+	    				event = "an-tow:pay",
+	    				icon = "fas fa-circle",
+	    				label = "Collect Payslip",
+	    				job = "tow"
+            },
+            },
+            distance = 2.0
+        })
+    else
+        exports['qb-target']:AddTargetEntity(payped, {
+            options = {
+                {
+                    type = "client",
+	    				event = "an-tow:pay",
+	    				icon = "fas fa-circle",
+	    				label = "Collect Payslip"
+            },
+            },
+            distance = 2.0
+        })
+    end
 end)
 
 
@@ -123,7 +164,7 @@ end)
 AddEventHandler('onResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
         PlayerJob = QBCore.Functions.GetPlayerData().job
-    end 
+    end
 end)
 
 function deliverVehicle(vehicle)
@@ -290,8 +331,53 @@ end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerJob = QBCore.Functions.GetPlayerData().job
+    if Config.RequireJob and PlayerJob.name == JobCode then
+        local TowBlip = AddBlipForCoord(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+        SetBlipSprite(TowBlip, 477)
+        SetBlipDisplay(TowBlip, 4)
+        SetBlipScale(TowBlip, 0.6)
+        SetBlipAsShortRange(TowBlip, true)
+        SetBlipColour(TowBlip, 15)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(Config.Locations["main"].label)
+        EndTextCommandSetBlipName(TowBlip)
+        local TowVehBlip = AddBlipForCoord(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
+        SetBlipSprite(TowVehBlip, 326)
+        SetBlipDisplay(TowVehBlip, 4)
+        SetBlipScale(TowVehBlip, 0.6)
+        SetBlipAsShortRange(TowVehBlip, true)
+        SetBlipColour(TowVehBlip, 15)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(Config.Locations["vehicle"].label)
+        EndTextCommandSetBlipName(TowVehBlip)
+        RunWorkThread()
+    elseif not Config.RequireJob then
+        local TowBlip = AddBlipForCoord(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+        SetBlipSprite(TowBlip, 477)
+        SetBlipDisplay(TowBlip, 4)
+        SetBlipScale(TowBlip, 0.6)
+        SetBlipAsShortRange(TowBlip, true)
+        SetBlipColour(TowBlip, 15)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(Config.Locations["main"].label)
+        EndTextCommandSetBlipName(TowBlip)
+        local TowVehBlip = AddBlipForCoord(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
+        SetBlipSprite(TowVehBlip, 326)
+        SetBlipDisplay(TowVehBlip, 4)
+        SetBlipScale(TowVehBlip, 0.6)
+        SetBlipAsShortRange(TowVehBlip, true)
+        SetBlipColour(TowVehBlip, 15)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(Config.Locations["vehicle"].label)
+        EndTextCommandSetBlipName(TowVehBlip)
+        RunWorkThread()
+    end
+end)
 
-    if PlayerJob.name == "tow" then
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
+    PlayerJob = JobInfo
+
+    if Config.RequireJob and PlayerJob.name == JobCode then
         local TowBlip = AddBlipForCoord(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
         SetBlipSprite(TowBlip, 477)
         SetBlipDisplay(TowBlip, 4)
@@ -313,13 +399,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
         EndTextCommandSetBlipName(TowVehBlip)
 
         RunWorkThread()
-    end
-end)
-
-RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
-    PlayerJob = JobInfo
-
-    if PlayerJob.name == "tow" then
+    else
         local TowBlip = AddBlipForCoord(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
         SetBlipSprite(TowBlip, 477)
         SetBlipDisplay(TowBlip, 4)
@@ -345,7 +425,34 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
 end)
 
 RegisterNetEvent('jobs:client:ToggleNpc', function()
-    if QBCore.Functions.GetPlayerData().job.name == "tow" then
+    if Config.RequireJob and QBCore.Functions.GetPlayerData().job.name == JobCode then
+        if CurrentTow ~= nil then
+            QBCore.Functions.Notify("First Finish Your Work", "error")
+            return
+        end
+        NpcOn = not NpcOn
+        if NpcOn then
+            sendpopups("Someone called for a tow, go to the location.")
+            local randomLocation = getRandomVehicleLocation()
+            CurrentLocation.x = Config.Locations["towspots"][randomLocation].coords.x
+            CurrentLocation.y = Config.Locations["towspots"][randomLocation].coords.y
+            CurrentLocation.z = Config.Locations["towspots"][randomLocation].coords.z
+            CurrentLocation.model = Config.Locations["towspots"][randomLocation].model
+            CurrentLocation.id = randomLocation
+
+            CurrentBlip = AddBlipForCoord(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)
+            SetBlipColour(CurrentBlip, 3)
+            SetBlipRoute(CurrentBlip, true)
+            SetBlipRouteColour(CurrentBlip, 3)
+        else
+            if DoesBlipExist(CurrentBlip) then
+                RemoveBlip(CurrentBlip)
+                CurrentLocation = {}
+                CurrentBlip = nil
+            end
+            VehicleSpawned = false
+        end
+    elseif not Config.RequireJob then
         if CurrentTow ~= nil then
             QBCore.Functions.Notify("First Finish Your Work", "error")
             return
@@ -523,28 +630,55 @@ function RunWorkThread()
             local shownHeader = false
             PlayerJob = QBCore.Functions.GetPlayerData().job
 
-            while LocalPlayer.state.isLoggedIn and PlayerJob.name == "tow" do
-                local sleep = 1000
-                local pos = GetEntityCoords(PlayerPedId())
-                local vehicleCoords = vector3(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
-                local mainCoords = vector3(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+            if Config.RequireJob then
 
-                if NpcOn and CurrentLocation ~= nil and next(CurrentLocation) ~= nil then
-                    if #(pos - vector3(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)) < 400.0 and not VehicleSpawned then
-                        VehicleSpawned = true
-                        QBCore.Functions.SpawnVehicle(CurrentLocation.model, function(veh)
-                            exports[Config.fuel]:SetFuel(veh, 0.0)
-                            if math.random(1,2) == 1 then
-                                doCarDamage(veh)
-                            end
-                            towablevehicle = veh
-                        end, CurrentLocation, true)
-                        
+                while LocalPlayer.state.isLoggedIn and PlayerJob.name == JobCode do
+                    local sleep = 1000
+                    local pos = GetEntityCoords(PlayerPedId())
+                    local vehicleCoords = vector3(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
+                    local mainCoords = vector3(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+
+                    if NpcOn and CurrentLocation ~= nil and next(CurrentLocation) ~= nil then
+                        if #(pos - vector3(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)) < 400.0 and not VehicleSpawned then
+                            VehicleSpawned = true
+                            QBCore.Functions.SpawnVehicle(CurrentLocation.model, function(veh)
+                                exports[Config.fuel]:SetFuel(veh, 0.0)
+                                if math.random(1,2) == 1 then
+                                    doCarDamage(veh)
+                                end
+                                towablevehicle = veh
+                            end, CurrentLocation, true)
+
+                        end
+                        sleep = 5
                     end
-                    sleep = 5
-                end
 
-                Wait(sleep)
+                    Wait(sleep)
+                end
+            else
+                while LocalPlayer.state.isLoggedIn do
+                    local sleep = 1000
+                    local pos = GetEntityCoords(PlayerPedId())
+                    local vehicleCoords = vector3(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
+                    local mainCoords = vector3(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+
+                    if NpcOn and CurrentLocation ~= nil and next(CurrentLocation) ~= nil then
+                        if #(pos - vector3(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)) < 400.0 and not VehicleSpawned then
+                            VehicleSpawned = true
+                            QBCore.Functions.SpawnVehicle(CurrentLocation.model, function(veh)
+                                exports[Config.fuel]:SetFuel(veh, 0.0)
+                                if math.random(1,2) == 1 then
+                                    doCarDamage(veh)
+                                end
+                                towablevehicle = veh
+                            end, CurrentLocation, true)
+
+                        end
+                        sleep = 5
+                    end
+
+                    Wait(sleep)
+                end
             end
         end)
 
@@ -600,29 +734,45 @@ end)
 
 
 CreateThread(function()
-    exports['qb-target']:AddGlobalVehicle({
-        options = {
-            {
-                icon = "fa-solid fa-magnifying-glass",
-                label = "Tow",
-                canInteract = function(entity)
-                    local oldtruck = GetVehiclePedIsIn(PlayerPedId(),true)
-                    local flatbed = GetHashKey('flatbed')
-                    local slamtruck = GetHashKey('slamtruck')
-                    if GetEntityModel(oldtruck) == flatbed or GetEntityModel(oldtruck) == slamtruck then return true end
-                        return false
-                end,
-                event = "an-tow:client:TowVehicle",
-                job = {
-                    ["tow"] = 0,
-                    ["mechanic"] = 0,
-                    ["hayes"] = 0,
-                    ["harmony"] = 0,
+    local AllowedJobs = Config.AllowedJobs
+    if Config.RequireJob then
+        exports['qb-target']:AddGlobalVehicle({
+            options = {
+                {
+                    icon = "fa-solid fa-magnifying-glass",
+                    label = "Tow",
+                    canInteract = function(entity)
+                        local oldtruck = GetVehiclePedIsIn(PlayerPedId(),true)
+                        local flatbed = GetHashKey('flatbed')
+                        local slamtruck = GetHashKey('slamtruck')
+                        if GetEntityModel(oldtruck) == flatbed or GetEntityModel(oldtruck) == slamtruck then return true end
+                            return false
+                    end,
+                    event = "an-tow:client:TowVehicle",
+                    job = Config.TowAllowedJobs,
                 },
             },
-        },
-        distance = 3
-    })
+            distance = 3
+        })
+    else
+        exports['qb-target']:AddGlobalVehicle({
+            options = {
+                {
+                    icon = "fa-solid fa-magnifying-glass",
+                    label = "Tow",
+                    canInteract = function(entity)
+                        local oldtruck = GetVehiclePedIsIn(PlayerPedId(),true)
+                        local flatbed = GetHashKey('flatbed')
+                        local slamtruck = GetHashKey('slamtruck')
+                        if GetEntityModel(oldtruck) == flatbed or GetEntityModel(oldtruck) == slamtruck then return true end
+                            return false
+                    end,
+                    event = "an-tow:client:TowVehicle"
+                },
+            },
+            distance = 3
+        })
+    end
 end)
     
 

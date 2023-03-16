@@ -1,5 +1,13 @@
 Config = {}
 
+Config.RequireJob = false
+Config.Job = "tow"
+Config.TowAllowedJobs = { --jobs and grades that can use the tow function if Config.RequireJob is True/ else all can use
+    ["tow"] = 0,
+    ["mechanic"] = 0,
+    ["hayes"] = 0,
+    ["harmony"] = 0,
+}
 Config.BailPrice = 100
 Config.Phone = 'qb' -- qb / gks / qs
 Config.dropprice = math.random(1000,2000) -- Price of each dropoff

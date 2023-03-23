@@ -36,22 +36,22 @@ CreateThread(function()
                 type = "client",
                 event = "an-tow:takeoutcar",
                 icon = "fas fa-circle",
-                label = "Take out the Flatbed",
+                label = Lang:t('info.take_out_flatbed'),
                 canInteract = function()
                     return not towout
                 end,
                 job = "tow"
-        },
-        {
+            },
+            {
                 type = "client",
                 event = "an-tow:parkcar",
                 icon = "fas fa-circle",
-                label = "Store the flatbed",
+                label = Lang:t('info.store_the_flatbed'),
                 canInteract = function()
                     return towout
                 end,
                 job = "tow"
-        },
+            },
         },
         distance = 2.0
     })
@@ -65,37 +65,35 @@ CreateThread(function()
         options = {
             {
                 type = "client",
-					event = "an-tow:pay",
-					icon = "fas fa-circle",
-					label = "Collect Payslip",
-					job = "tow"
-        },
+                event = "an-tow:pay",
+                icon = "fas fa-circle",
+                label = Lang:t('info.collect_payslip'),
+                job = "tow"
+            },
         },
         distance = 2.0
     })
 end)
 
-
-
 function sendemail(sent)
     local email = sent
     if Config.Phone == 'qb' then 
         TriggerServerEvent('qb-phone:server:sendNewMail', {
-            sender = "Floyd",
-            subject = "Tow Job",
+            sender = Lang:t('email.sender'),
+            subject = Lang:t('email.subject'),
             message = email,
         })
     elseif Config.Phone == 'gks' then
         TriggerServerEvent('gksphone:NewMail', {
-            sender = "Floyd",
+            sender = Lang:t('email.sender'),
             image = '/html/static/img/icons/mail.png',
-            subject = 'Tow Job',
+            subject = Lang:t('email.subject'),
             message = email,
         })
     elseif Config.Phone == 'qs' then
         TriggerServerEvent('qs-smartphone:server:sendNewMail', {
             sender = 'Floyd',
-            subject = 'Tow Job',
+            subject = Lang:t('email.subject'),
             message = email,
             button = {}
         })
@@ -105,11 +103,11 @@ end
 function sendpopups(sent)
     local popup = sent
     if Config.Phone == 'qb' then
-        TriggerEvent('qb-phone:client:CustomNotification','Tow', popup, 'fas fa-location-arrow', '#FF0000', 5500)
+        TriggerEvent('qb-phone:client:CustomNotification', Lang:t('info.tow'), popup, 'fas fa-location-arrow', '#FF0000', 5500)
     elseif Config.Phone == 'gks' then
-        TriggerEvent('gksphone:notifi', {title = "CURRENT TASK", message = popup, img= '/html/static/img/icons/messages.png'})
+        TriggerEvent('gksphone:notifi', {title = Lang:t('info.current_task'), message = popup, img= '/html/static/img/icons/messages.png'})
     elseif Config.Phone == 'qs' then
-        TriggerEvent('qs-smartphone:client:notify', {title = 'CURRENT TASK', text = popup, icon = './img/apps/whatsapp.png', timeout = 4000})
+        TriggerEvent('qs-smartphone:client:notify', {title = Lang:t('info.current_task'), text = popup, icon = './img/apps/whatsapp.png', timeout = 4000})
     end
 end
 
@@ -147,9 +145,9 @@ function getnewvehicle()
 end
 
 local function getVehicleInDirection(coordFrom, coordTo)
-	local rayHandle = CastRayPointToPoint(coordFrom.x, coordFrom.y, coordFrom.z, coordTo.x, coordTo.y, coordTo.z, 10, PlayerPedId(), 0)
-	local a, b, c, d, vehicle = GetRaycastResult(rayHandle)
-	return vehicle
+    local rayHandle = CastRayPointToPoint(coordFrom.x, coordFrom.y, coordFrom.z, coordTo.x, coordTo.y, coordTo.z, 10, PlayerPedId(), 0)
+    local a, b, c, d, vehicle = GetRaycastResult(rayHandle)
+    return vehicle
 end
 
 local function isTowVehicle(vehicle)
@@ -163,7 +161,7 @@ local function isTowVehicle(vehicle)
 end
 
 local function DrawText3D(x, y, z, text)
-	SetTextScale(0.35, 0.35)
+    SetTextScale(0.35, 0.35)
     SetTextFont(4)
     SetTextProportional(1)
     SetTextColour(255, 255, 255, 215)
@@ -178,57 +176,57 @@ local function DrawText3D(x, y, z, text)
 end
 
 local function doCarDamage(currentVehicle)
-	local smash = false
-	local damageOutside = false
-	local damageOutside2 = false
-	local engine = 199.0
-	local body = 149.0
-	if engine < 200.0 then
-		engine = 200.0
+    local smash = false
+    local damageOutside = false
+    local damageOutside2 = false
+    local engine = 199.0
+    local body = 149.0
+    if engine < 200.0 then
+        engine = 200.0
     end
 
     if engine  > 1000.0 then
         engine = 950.0
     end
 
-	if body < 150.0 then
-		body = 150.0
-	end
-	if body < 950.0 then
-		smash = true
-	end
+    if body < 150.0 then
+        body = 150.0
+    end
+    if body < 950.0 then
+        smash = true
+    end
 
-	if body < 920.0 then
-		damageOutside = true
-	end
+    if body < 920.0 then
+        damageOutside = true
+    end
 
-	if body < 920.0 then
-		damageOutside2 = true
-	end
+    if body < 920.0 then
+        damageOutside2 = true
+    end
 
     Wait(100)
     SetVehicleEngineHealth(currentVehicle, engine)
-	if smash then
-		SmashVehicleWindow(currentVehicle, 0)
-		SmashVehicleWindow(currentVehicle, 1)
-		SmashVehicleWindow(currentVehicle, 2)
-		SmashVehicleWindow(currentVehicle, 3)
-		SmashVehicleWindow(currentVehicle, 4)
-	end
-	if damageOutside then
-		SetVehicleDoorBroken(currentVehicle, 1, true)
-		SetVehicleDoorBroken(currentVehicle, 6, true)
-		SetVehicleDoorBroken(currentVehicle, 4, true)
-	end
-	if damageOutside2 then
-		SetVehicleTyreBurst(currentVehicle, 1, false, 990.0)
-		SetVehicleTyreBurst(currentVehicle, 2, false, 990.0)
-		SetVehicleTyreBurst(currentVehicle, 3, false, 990.0)
-		SetVehicleTyreBurst(currentVehicle, 4, false, 990.0)
-	end
-	if body < 1000 then
-		SetVehicleBodyHealth(currentVehicle, 985.1)
-	end
+    if smash then
+        SmashVehicleWindow(currentVehicle, 0)
+        SmashVehicleWindow(currentVehicle, 1)
+        SmashVehicleWindow(currentVehicle, 2)
+        SmashVehicleWindow(currentVehicle, 3)
+        SmashVehicleWindow(currentVehicle, 4)
+    end
+    if damageOutside then
+        SetVehicleDoorBroken(currentVehicle, 1, true)
+        SetVehicleDoorBroken(currentVehicle, 6, true)
+        SetVehicleDoorBroken(currentVehicle, 4, true)
+    end
+    if damageOutside2 then
+        SetVehicleTyreBurst(currentVehicle, 1, false, 990.0)
+        SetVehicleTyreBurst(currentVehicle, 2, false, 990.0)
+        SetVehicleTyreBurst(currentVehicle, 3, false, 990.0)
+        SetVehicleTyreBurst(currentVehicle, 4, false, 990.0)
+    end
+    if body < 1000 then
+        SetVehicleBodyHealth(currentVehicle, 985.1)
+    end
 end
 
 -- Old Menu Code (being removed)
@@ -236,7 +234,7 @@ end
 local function MenuGarage()
     local towMenu = {
         {
-            header = "Available Trucks",
+            header = Lang:t('info.available_trucks'),
             isMenuHeader = true
         }
     }
@@ -253,7 +251,7 @@ local function MenuGarage()
     end
 
     towMenu[#towMenu+1] = {
-        header = "⬅ Close Menu",
+        header = Lang:t('info.close_menu'),
         txt = "",
         params = {
             event = "qb-menu:client:closeMenu"
@@ -347,12 +345,12 @@ end)
 RegisterNetEvent('jobs:client:ToggleNpc', function()
     if QBCore.Functions.GetPlayerData().job.name == "tow" then
         if CurrentTow ~= nil then
-            QBCore.Functions.Notify("First Finish Your Work", "error")
+            QBCore.Functions.Notify(Lang:t('error.finish_your_work'), "error")
             return
         end
         NpcOn = not NpcOn
         if NpcOn then
-            sendpopups("Someone called for a tow, go to the location.")
+            sendpopups(Lang:t('info.someone_called_tow'))
             local randomLocation = getRandomVehicleLocation()
             CurrentLocation.x = Config.Locations["towspots"][randomLocation].coords.x
             CurrentLocation.y = Config.Locations["towspots"][randomLocation].coords.y
@@ -375,7 +373,6 @@ RegisterNetEvent('jobs:client:ToggleNpc', function()
     end
 end)
 
-
 RegisterNetEvent('an-tow:client:TowVehicle', function()
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
     if isTowVehicle(vehicle) then
@@ -389,7 +386,7 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
             local modelName = GetDisplayNameFromVehicleModel(selectedVeh)
                 if NpcOn and CurrentLocation ~= nil then
                     if GetEntityModel(targetVehicle) ~= GetHashKey(CurrentLocation.model) then
-                        QBCore.Functions.Notify("This Is Not The Right Vehicle", "error")
+                        QBCore.Functions.Notify(Lang:t('error.not_right_vehicle'), "error")
                         return
                     end
                 end
@@ -401,7 +398,7 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                         local flatbed = GetHashKey('flatbed')
                         local slamtruck = GetHashKey('slamtruck')                   
                         if #(towPos - targetPos) < 11.0 then
-                            QBCore.Functions.Progressbar("towing_vehicle", "Hoisting the Vehicle...", 5000, false, true, {
+                            QBCore.Functions.Progressbar("towing_vehicle", Lang:t('info.hoisting_vehicle'), 5000, false, true, {
                                 disableMovement = true,
                                 disableCarMovement = true,
                                 disableMouse = false,
@@ -412,23 +409,22 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                 flags = 16,
                             }, {}, {}, function() -- Done
                                 StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
-                                sendpopups("Take the vehicle to the impoundlot.")
+                                sendpopups(Lang:t('info.take_vehicle_impound_lot'))
                                 local bone = GetEntityBoneIndexByName(vehicle, 'bodyshell')
                             if  modelName == 'SLAMTRUCK' then
                                 AttachEntityToEntity(targetVehicle, vehicle, GetEntityBoneIndexByName(vehicle, 'bodyshell'), 0.0, -0.90 + -0.85, -0.4 + 1.15, 0, 0, 0, 1, 1, 0, 1, 0, 1)
                                 NetworkRequestControlOfEntity(targetVehicle)
                                 FreezeEntityPosition(targetVehicle, true)
                             else
-                                AttachEntityToEntity(targetVehicle, vehicle, GetEntityBoneIndexByName(vehicle, 'bodyshell'), 0.0, -1.5 + -0.85, -0.32 + 1.15, 0, 0, 0, 1, 1, 0, 1, 0, 1)
+                                AttachEntityToEntity(targetVehicle, vehicle, GetEntityBoneIndexByName(vehicle, 'bodyshell'), 0.0, -1.5 + -0.85, -0.35 + 1.60, 0, 0, 0, 1, 1, 0, 1, 0, 1)
                                 NetworkRequestControlOfEntity(targetVehicle)
                                 FreezeEntityPosition(targetVehicle, true)
                             end
                                 CurrentTow = targetVehicle
-                                
                                 if NpcOn then
                                     local item = "cryptostick"
                                     RemoveBlip(CurrentBlip)
-                                    QBCore.Functions.Notify("Take The Vehicle To Hayes Depot", "success", 5000)
+                                    QBCore.Functions.Notify(Lang:t('success.take_vehicle_hayes_depot'), "success", 5000)
                                     CurrentBlip2 = AddBlipForCoord(-238.66, -1177.61, 23.04)
                                     SetBlipColour(CurrentBlip2, 3)
                                     SetBlipRoute(CurrentBlip2, true)
@@ -438,16 +434,16 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                     TriggerServerEvent('an-tow:server:giveitem', item, 1, cryptostick)
                                     cryptostick = false
                                 end
-                                QBCore.Functions.Notify("Vehicle Towed")
+                                QBCore.Functions.Notify(Lang:t('success.vehicle_towed'), "success", 5000)
                             end, function() -- Cancel
                                 StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
-                                QBCore.Functions.Notify("Failed", "error")
+                                QBCore.Functions.Notify(Lang:t('error.failed'), "error")
                             end)
                         end
                     end
                 end
             else
-                QBCore.Functions.Progressbar("untowing_vehicle", "Remove The Vehicle", 5000, false, true, {
+                QBCore.Functions.Progressbar("untowing_vehicle", Lang:t('info.removing_vehicle'), 5000, false, true, {
                     disableMovement = true,
                     disableCarMovement = true,
                     disableMouse = false,
@@ -477,21 +473,21 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
 
                     if #(targetPos - vector3(-238.66, -1177.61, 23.04)) < 25.0 then                      
                             deliverVehicle(CurrentTow)
-                            sendpopups("You Have Delivered A Vehicle, Standby.")
+                            sendpopups(Lang:t('info.vehicle_delivered'))
                         end
                     end
                     CurrentTow = nil
-                    QBCore.Functions.Notify("Vehicle Taken Off")
+                    QBCore.Functions.Notify(Lang:t('success.vehicle_taken_off'), "success", 5000)
                     Wait(Config.waitbetweenjobs * 1000)
-                    sendpopups("A New Vehicle Can Be Picked Up")
+                    sendpopups(Lang:t('info.new_vehicle_for_pickup'))
                     getnewvehicle()
                 end, function() -- Cancel
                     StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
-                    QBCore.Functions.Notify("Failed", "error")
+                    QBCore.Functions.Notify(Lang:t('error.failed'), "error", 5000)
                 end)
             end
     else
-        QBCore.Functions.Notify("You Must Have Been In A Towing Vehicle First", "error")
+        QBCore.Functions.Notify(Lang:t('error.must_be_towing_vehicle'), "error", 5000)
     end
 end)
 
@@ -566,7 +562,7 @@ AddEventHandler("an-tow:pay", function()
     JobsDone = 0
     NpcOn = false
     else
-    QBCore.Functions.Notify("You have not done any work yet.", "error")
+    QBCore.Functions.Notify(Lang:t('error.no_work_done'), "error", 5000)
     end
 end)
 
@@ -582,29 +578,27 @@ AddEventHandler("an-tow:parkcar", function()
     if distance < 40 then -- distance limiter to make sure it's close enough change as you wish
         local isTruck = isTowVehicle(closestVehicle) -- uses existing function so will work as normal
         if isTruck then
-            print("Deleting vehicle")
             towout = false
-            QBCore.Functions.Notify("Vehicle is stored.", "success")
+            QBCore.Functions.Notify(Lang:t('success.vehicle_stored'), "success", 5000)
             NetworkRequestControlOfEntity(closestVehicle) -- network entity ownership check before deletion
             QBCore.Functions.DeleteVehicle(closestVehicle)
             TriggerServerEvent('an-tow:server:DoBail', false)
         else
-            print("closest vehicle was not the delivery truck")
-            QBCore.Functions.Notify("closest vehicle was not the delivery truck", "error")
+            print(Lang:t('error.closest_vehicle_not_delivery_truck'))
+            QBCore.Functions.Notify(Lang:t('error.closest_vehicle_not_delivery_truck'), "error", 5000)
         end       
     else
-        print("no vehicle was nearby")
-        QBCore.Functions.Notify("no vehicle was nearby", "error")
+        print(Lang:t('error.no_vehicle_nearby'))
+        QBCore.Functions.Notify(Lang:t('error.no_vehicle_nearby'), "error", 5000)
     end
 end)
-
 
 CreateThread(function()
     exports['qb-target']:AddGlobalVehicle({
         options = {
             {
                 icon = "fa-solid fa-magnifying-glass",
-                label = "Tow",
+                label = Lang:t('info.tow'),
                 canInteract = function(entity)
                     local oldtruck = GetVehiclePedIsIn(PlayerPedId(),true)
                     local flatbed = GetHashKey('flatbed')
@@ -624,5 +618,3 @@ CreateThread(function()
         distance = 3
     })
 end)
-    
-

@@ -9,21 +9,21 @@ RegisterNetEvent('an-tow:server:DoBail', function(bool, vehInfo)
         if Player.PlayerData.money.cash >= Config.BailPrice then
             Bail[Player.PlayerData.citizenid] = Config.BailPrice
             Player.Functions.RemoveMoney('cash', Config.BailPrice, "tow-paid-bail")
-            TriggerClientEvent('QBCore:Notify', src, 'You Have The Deposit of $'..Config.BailPrice..',- paid', 'success')
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('success.deposit_of_paid', {price = Config.BailPrice}), 'success')
             TriggerClientEvent('an-tow:client:SpawnVehicle', src, vehInfo)
         elseif Player.PlayerData.money.bank >= Config.BailPrice then
             Bail[Player.PlayerData.citizenid] = Config.BailPrice
             Player.Functions.RemoveMoney('bank', Config.BailPrice, "tow-paid-bail")
-            TriggerClientEvent('QBCore:Notify', src, 'You Have Paid The Deposit Of $'..Config.BailPrice..' Paid', 'success')
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('success.you_have_paid', {price = Config.BailPrice}), 'success')
             TriggerClientEvent('an-tow:client:SpawnVehicle', src, vehInfo)
         else
-            TriggerClientEvent('QBCore:Notify', src, 'Note Enough Money, The Deposit Is $'..Config.BailPrice..'', 'error')
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('error.not_enough_money_deposit', {price = Config.BailPrice}), 'error')
         end
     else
         if Bail[Player.PlayerData.citizenid] ~= nil then
             Player.Functions.AddMoney('bank', Bail[Player.PlayerData.citizenid], "tow-bail-paid")
             Bail[Player.PlayerData.citizenid] = nil
-            TriggerClientEvent('QBCore:Notify', src, 'You Got Back $'..Config.BailPrice..' From The Deposit', 'success')
+            TriggerClientEvent('QBCore:Notify', src, Lang:t('success.you_got_back', {price = Config.BailPrice}), 'success')
         end
     end
 end)
@@ -60,10 +60,10 @@ RegisterNetEvent('an-tow:server:getpaid', function(drops)
 
     Player.Functions.AddJobReputation(1)
     Player.Functions.AddMoney("bank", payment, "tow-salary")
-    TriggerClientEvent('an-tow:client:sendemail', src, 'You Got paid $'..payment..' thank you for your service')
+    TriggerClientEvent('an-tow:client:sendemail', src, Lang:t('success.you_got_paid', {payment = payment}), 'success')
     
 end)
 
-QBCore.Commands.Add("npc", "Toggle Npc Job", {}, false, function(source, args)
+QBCore.Commands.Add("npc", Lang:t('info.toggle_npc_job'), {}, false, function(source, args)
 	TriggerClientEvent("jobs:client:ToggleNpc", source)
 end)

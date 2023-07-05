@@ -12,6 +12,8 @@ local towable = false
 local towout = false
 local cryptostick = false
 
+local JobStarted = false
+
 -- Functions
 
 local function getRandomVehicleLocation()
@@ -286,6 +288,18 @@ RegisterNetEvent('an-tow:client:SpawnVehicle', function()
     
 end)
 
+CreateThread(function()
+    local TowBlip = AddBlipForCoord(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+    SetBlipSprite(TowBlip, 477)
+    SetBlipDisplay(TowBlip, 4)
+    SetBlipScale(TowBlip, 0.6)
+    SetBlipAsShortRange(TowBlip, true)
+    SetBlipColour(TowBlip, 15)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentSubstringPlayerName(Config.Locations["main"].label)
+    EndTextCommandSetBlipName(TowBlip)
+end)
+
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerJob = QBCore.Functions.GetPlayerData().job
 
@@ -299,17 +313,6 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(Config.Locations["main"].label)
         EndTextCommandSetBlipName(TowBlip)
-
-        local TowVehBlip = AddBlipForCoord(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
-        SetBlipSprite(TowVehBlip, 326)
-        SetBlipDisplay(TowVehBlip, 4)
-        SetBlipScale(TowVehBlip, 0.6)
-        SetBlipAsShortRange(TowVehBlip, true)
-        SetBlipColour(TowVehBlip, 15)
-        BeginTextCommandSetBlipName("STRING")
-        AddTextComponentSubstringPlayerName(Config.Locations["vehicle"].label)
-        EndTextCommandSetBlipName(TowVehBlip)
-
         RunWorkThread()
     end
 end)
@@ -327,16 +330,6 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
         BeginTextCommandSetBlipName("STRING")
         AddTextComponentSubstringPlayerName(Config.Locations["main"].label)
         EndTextCommandSetBlipName(TowBlip)
-
-        local TowVehBlip = AddBlipForCoord(Config.Locations["vehicle"].coords.x, Config.Locations["vehicle"].coords.y, Config.Locations["vehicle"].coords.z)
-        SetBlipSprite(TowVehBlip, 326)
-        SetBlipDisplay(TowVehBlip, 4)
-        SetBlipScale(TowVehBlip, 0.6)
-        SetBlipAsShortRange(TowVehBlip, true)
-        SetBlipColour(TowVehBlip, 15)
-        BeginTextCommandSetBlipName("STRING")
-        AddTextComponentSubstringPlayerName(Config.Locations["vehicle"].label)
-        EndTextCommandSetBlipName(TowVehBlip)
 
         RunWorkThread()
     end
@@ -362,12 +355,14 @@ RegisterNetEvent('jobs:client:ToggleNpc', function()
             SetBlipColour(CurrentBlip, 3)
             SetBlipRoute(CurrentBlip, true)
             SetBlipRouteColour(CurrentBlip, 3)
+            JobStarted = true
         else
             if DoesBlipExist(CurrentBlip) then
                 RemoveBlip(CurrentBlip)
                 CurrentLocation = {}
                 CurrentBlip = nil
             end
+            JobStarted = false
             VehicleSpawned = false
         end
     end
@@ -409,7 +404,11 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                 flags = 16,
                             }, {}, {}, function() -- Done
                                 StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
-                                sendpopups(Lang:t('info.take_vehicle_impound_lot'))
+                                if JobStarted then
+                                    sendpopups(Lang:t('info.take_vehicle_impound_lot'))
+                                else
+                                    sendpopups('Take Car Back To Station To Depot')
+                                end
                                 local bone = GetEntityBoneIndexByName(vehicle, 'bodyshell')
                             if  modelName == 'SLAMTRUCK' then
                                 AttachEntityToEntity(targetVehicle, vehicle, GetEntityBoneIndexByName(vehicle, 'bodyshell'), 0.0, -0.90 + -0.85, -0.4 + 1.15, 0, 0, 0, 1, 1, 0, 1, 0, 1)
@@ -421,18 +420,21 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                 FreezeEntityPosition(targetVehicle, true)
                             end
                                 CurrentTow = targetVehicle
-                                if NpcOn then
-                                    local item = "cryptostick"
-                                    RemoveBlip(CurrentBlip)
-                                    QBCore.Functions.Notify(Lang:t('success.take_vehicle_hayes_depot'), "success", 5000)
-                                    CurrentBlip2 = AddBlipForCoord(-238.66, -1177.61, 23.04)
-                                    SetBlipColour(CurrentBlip2, 3)
-                                    SetBlipRoute(CurrentBlip2, true)
-                                    SetBlipRouteColour(CurrentBlip2, 3)
-                                    cryptostick = true
-                                    Wait(100)
-                                    TriggerServerEvent('an-tow:server:giveitem', item, 1, cryptostick)
-                                    cryptostick = false
+
+                                if JobStarted then
+                                    if NpcOn then
+                                        local item = "cryptostick"
+                                        RemoveBlip(CurrentBlip)
+                                        QBCore.Functions.Notify(Lang:t('success.take_vehicle_hayes_depot'), "success", 5000)
+                                        CurrentBlip2 = AddBlipForCoord(-238.66, -1177.61, 23.04)
+                                        SetBlipColour(CurrentBlip2, 3)
+                                        SetBlipRoute(CurrentBlip2, true)
+                                        SetBlipRouteColour(CurrentBlip2, 3)
+                                        cryptostick = true
+                                        Wait(100)
+                                        TriggerServerEvent('an-tow:server:giveitem', item, 1, cryptostick)
+                                        cryptostick = false
+                                    end
                                 end
                                 QBCore.Functions.Notify(Lang:t('success.vehicle_towed'), "success", 5000)
                             end, function() -- Cancel
@@ -468,19 +470,25 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                         AttachEntityToEntity(CurrentTow, vehicle, 20, -0.0, -12.0, 1.0, 0.0, 0.0, 0.0, false, false, false, false, 20, true)
                         DetachEntity(CurrentTow, true, true)
                     end
-                    if NpcOn then
-                        local targetPos = GetEntityCoords(CurrentTow)
-
-                    if #(targetPos - vector3(-238.66, -1177.61, 23.04)) < 25.0 then                      
-                            deliverVehicle(CurrentTow)
-                            sendpopups(Lang:t('info.vehicle_delivered'))
+                    if JobStarted then
+                        if NpcOn then
+                            local targetPos = GetEntityCoords(CurrentTow)
+    
+                        if #(targetPos - vector3(-238.66, -1177.61, 23.04)) < 25.0 then                      
+                                deliverVehicle(CurrentTow)
+                                sendpopups(Lang:t('info.vehicle_delivered'))
+                            end
                         end
+                        CurrentTow = nil
+                        QBCore.Functions.Notify(Lang:t('success.vehicle_taken_off'), "success", 5000)
+                        Wait(Config.waitbetweenjobs * 1000)
+                        sendpopups(Lang:t('info.new_vehicle_for_pickup'))
+                        getnewvehicle()
+                    else
+                        CurrentTow = nil
+                        QBCore.Functions.Notify(Lang:t('success.vehicle_taken_off'), "success", 5000)
                     end
-                    CurrentTow = nil
-                    QBCore.Functions.Notify(Lang:t('success.vehicle_taken_off'), "success", 5000)
-                    Wait(Config.waitbetweenjobs * 1000)
-                    sendpopups(Lang:t('info.new_vehicle_for_pickup'))
-                    getnewvehicle()
+
                 end, function() -- Cancel
                     StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
                     QBCore.Functions.Notify(Lang:t('error.failed'), "error", 5000)

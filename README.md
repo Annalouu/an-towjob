@@ -8,27 +8,6 @@
 # Installaion
 - If You Use Qb-Phone ( Renewed Phone ) then make Config.reqTow = true other wise false
 
-Add This If You Enabled Config.reqTow
-```lua
-	["requestTow"] = {
-        bones = {
-            "seat_dside_f",
-        },
-        options = {
-            {
-                type = "client",
-                event = "tow:requestTow",
-                icon = "fas fa-truck",
-                label = "Request Tow",
-            },
-        },
-        distance = 4.0
-    },
-```
-
-Like This : 
-![code-snapshot](https://github.com/FzzyYT69/an-towjob/assets/99145322/2b4f4ff2-3d89-4c4b-b6e9-5e674f6f76ed)
-
 # Feats
 
 - All interactions has been moved to be integrated inside the script.

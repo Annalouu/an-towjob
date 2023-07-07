@@ -49,7 +49,7 @@ Like This :
 - qb-core
 - qb-target
 - qb/qs/gks phone
-- cdn-fuel/ps-fuel/cdn-fuel (in the config)
+- cdn-fuel/ps-fuel/LegacyFuel (in the config)
 
 # Questions:
 - Q: The Npc cars aren't spawning after i restarted the script

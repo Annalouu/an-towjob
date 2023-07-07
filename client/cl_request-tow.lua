@@ -7,7 +7,7 @@ if Config.reqTow then
                     icon = "fas fa-truck",
                     type = "client",
                     label = "Request Tow",
-                    event = "tow:requestTow",
+                    event = "an-tow:requestTow",
                 },
             },
             distance = 3

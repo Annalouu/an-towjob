@@ -2,9 +2,12 @@ Config = {}
 
 Config.BailPrice = 100
 Config.Phone = 'qb' -- qb / gks / qs
+-- Enable if using renewed's qb-phone
+Config.reqTow = false
 Config.dropprice = math.random(1000,2000) -- Price of each dropoff
 Config.waitbetweenjobs = 10 -- in seconds
 Config.fuel = 'cdn-fuel'
+
 Config.Vehicles = {
     ["flatbed"] = "Flatbed",
     ["Slamtruck"] = "Slamtruck",

@@ -36,7 +36,7 @@ Like This :
 - Much simplier and everything is in the Config.
 - Added a slamtruck to the existing flatbed
 - Added support for qb/gks/qs phones (notifications/emails)
-- Tow Request System (Requirements : https://github.com/Renewed-Scripts/qb-phone )
+- Tow Request System (Requirements : https://github.com/Renewed-Scripts/qb-phone ) Credit Goes To PineappleOnMyPizza For Providing Tow Request System
 
 # Installation 
 

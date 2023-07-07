@@ -1,6 +1,19 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 if Config.reqTow then
+    CreateThread(function()
+        exports['qb-target']:AddGlobalVehicle({
+            options = {
+                {
+                    icon = "fas fa-truck",
+                    type = "client",
+                    label = "Request Tow",
+                    event = "tow:requestTow",
+                },
+            },
+            distance = 3
+        })
+    end)
     RegisterNetEvent('an-tow:requestTow')
     AddEventHandler('an-tow:requestTow', function()
         local player = PlayerPedId()

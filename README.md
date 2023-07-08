@@ -28,8 +28,10 @@
 - qb-core
 - qb-target
 - qb/qs/gks phone
-- cdn-fuel/ps-fuel/cdn-fuel (in the config)
+- cdn-fuel/ps-fuel/LegacyFuel (in the config)
 
 # Questions:
 - Q: The Npc cars aren't spawning after i restarted the script
 - A: You need to setjob yourself after each script restart, since it will need to update your job within itself and it needs to be able to read your job.
+
+Credit to : https://github.com/FzzyYT69 for Adding a lot of new features.

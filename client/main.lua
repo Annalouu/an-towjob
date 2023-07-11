@@ -551,7 +551,8 @@ function RunWorkThread()
                 local mainCoords = vector3(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
 
                 if NpcOn and CurrentLocation ~= nil and next(CurrentLocation) ~= nil then
-                    if #(pos - vector3(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)) < 400.0 and not VehicleSpawned then
+                    if not VehicleSpawned then
+                        Wait(13 * 1000)
                         VehicleSpawned = true
                         QBCore.Functions.SpawnVehicle(CurrentLocation.model, function(veh)
                             exports[Config.fuel]:SetFuel(veh, 0.0)

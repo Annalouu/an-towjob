@@ -335,6 +335,23 @@ RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     end
 end)
 
+AddEventHandler('onResourceStart', function(resource)
+    if resource == GetCurrentResourceName() then
+      Wait(100)
+      PlayerJob = QBCore.Functions.GetPlayerData().job
+        local TowBlip = AddBlipForCoord(Config.Locations["main"].coords.x, Config.Locations["main"].coords.y, Config.Locations["main"].coords.z)
+        SetBlipSprite(TowBlip, 477)
+        SetBlipDisplay(TowBlip, 4)
+        SetBlipScale(TowBlip, 0.6)
+        SetBlipAsShortRange(TowBlip, true)
+        SetBlipColour(TowBlip, 15)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(Config.Locations["main"].label)
+        EndTextCommandSetBlipName(TowBlip)
+        RunWorkThread()
+    end
+end)
+
 RegisterNetEvent('jobs:client:ToggleNpc', function()
     if QBCore.Functions.GetPlayerData().job.name == "tow" then
         if CurrentTow ~= nil then

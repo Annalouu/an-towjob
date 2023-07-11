@@ -607,6 +607,13 @@ AddEventHandler("an-tow:parkcar", function()
             QBCore.Functions.Notify(Lang:t('success.vehicle_stored'), "success", 5000)
             NetworkRequestControlOfEntity(closestVehicle) -- network entity ownership check before deletion
             QBCore.Functions.DeleteVehicle(closestVehicle)
+            if DoesBlipExist(CurrentBlip) then
+                RemoveBlip(CurrentBlip)
+                CurrentLocation = {}
+                CurrentBlip = nil
+            end
+            JobStarted = false
+            VehicleSpawned = false
             TriggerServerEvent('an-tow:server:DoBail', false)
         else
             print(Lang:t('error.closest_vehicle_not_delivery_truck'))

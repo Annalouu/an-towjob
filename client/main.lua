@@ -553,7 +553,7 @@ function RunWorkThread()
 
                 if NpcOn and CurrentLocation ~= nil and next(CurrentLocation) ~= nil then
                     if not VehicleSpawned then
-                        Wait(13 * 1000)
+                        Wait(Config.waitbetweenjobs + 3 * 1000)
                         VehicleSpawned = true
                         QBCore.Functions.SpawnVehicle(CurrentLocation.model, function(veh)
                             exports[Config.fuel]:SetFuel(veh, 0.0)

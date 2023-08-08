@@ -381,6 +381,7 @@ RegisterNetEvent('jobs:client:ToggleNpc', function()
             end
             JobStarted = false
             VehicleSpawned = false
+            QBCore.Functions.DeleteVehicle(towablevehicle)
         end
     end
 end)
@@ -615,6 +616,7 @@ AddEventHandler("an-tow:parkcar", function()
             end
             JobStarted = false
             VehicleSpawned = false
+            QBCore.Functions.DeleteVehicle(towablevehicle)
             TriggerServerEvent('an-tow:server:DoBail', false)
         else
             print(Lang:t('error.closest_vehicle_not_delivery_truck'))

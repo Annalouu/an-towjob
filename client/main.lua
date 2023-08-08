@@ -562,6 +562,7 @@ function RunWorkThread()
                             end
                             towablevehicle = veh
                         end, CurrentLocation, true)
+                        print(CurrentLocation.model)
                         
                     end
                     sleep = 5

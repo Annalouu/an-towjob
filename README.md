@@ -8,8 +8,11 @@
 # Installaion
 - If You Use Qb-Phone ( Renewed Phone ) then make Config.reqTow = true other wise false
 
+
+
 # Feats
 
+- Tow request (still not finished yet)
 - All interactions has been moved to be integrated inside the script.
 - Utilize of qb-target/ox_target (you don't have to change nothing)
 - Much simplier and everything is in the Config.

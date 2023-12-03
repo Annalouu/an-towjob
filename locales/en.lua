@@ -8,6 +8,7 @@ local Translations = {
         closest_vehicle_not_delivery_truck = "closest vehicle was not the delivery truck",
         no_vehicle_nearby = "no vehicle was nearby",
         not_enough_money_deposit = "Note Enough Money, The Deposit Is $%{price}",
+        impound_flatbed_needed = "You need a flatbed from the impound.",
     },
     success = {
         take_vehicle_hayes_depot = "Take The Vehicle To Hayes Depot",

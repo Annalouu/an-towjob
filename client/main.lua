@@ -379,7 +379,7 @@ RegisterNetEvent('an-towjob:client:ToggleNpc', function()
             end
         end
     else
-        QBCore.Functions.Notify("You need a flatbed from the impound.", "error")
+        QBCore.Functions.Notify(Lang:t('error.impound_flatbed_needed'), "error")
     end
 end)
 

@@ -12,13 +12,12 @@
 
 # Feats
 
-- Tow request (still not finished yet)
 - All interactions has been moved to be integrated inside the script.
 - Utilize of qb-target/ox_target (you don't have to change nothing)
 - Much simplier and everything is in the Config.
 - Added a slamtruck to the existing flatbed
 - Added support for qb/gks/qs phones (notifications/emails)
-- Tow Request System (Requirements : https://github.com/Renewed-Scripts/qb-phone ) Credit Goes To PineappleOnMyPizza For Providing Tow Request System
+- Tow Request System (still not finished yet) (Requirements : https://github.com/Renewed-Scripts/qb-phone ) Credit Goes To PineappleOnMyPizza For Providing Tow Request System
 
 # Installation 
 

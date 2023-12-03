@@ -54,27 +54,17 @@ CreateThread(function()
                 end,
                 job = "tow"
             },
-        },
-        distance = 2.0
-    })
-    QBCore.Functions.LoadModel(Config.payPedHash)
-    payped = CreatePed(0, Config.payPedHash, Config.payPedPos.x, Config.payPedPos.y, Config.payPedPos.z-1.0, Config.payPedPos.w, false, false)
-    TaskStartScenarioInPlace(payped,  true)
-    FreezeEntityPosition(payped, true)
-    SetEntityInvincible(payped, true)
-    SetBlockingOfNonTemporaryEvents(payped, true)
-    exports['qb-target']:AddTargetEntity(payped, {
-        options = {
             {
                 type = "client",
                 event = "an-tow:pay",
-                icon = "fas fa-circle",
+                icon = "fa fa-money-bill",
                 label = Lang:t('info.collect_payslip'),
                 job = "tow"
             },
         },
         distance = 2.0
     })
+    
 end)
 
 function sendemail(sent)
@@ -129,6 +119,7 @@ end)
 function deliverVehicle(vehicle)
     DeleteVehicle(vehicle)
     RemoveBlip(CurrentBlip2)
+    RemoveBlip(CurrentBlip)
     JobsDone = JobsDone + 1
     VehicleSpawned = false
 end
@@ -284,6 +275,7 @@ RegisterNetEvent('an-tow:client:SpawnVehicle', function()
         for i = 1, 9, 1 do
             SetVehicleExtra(veh, i, 0)
         end
+        globalplate = QBCore.Functions.GetPlate(veh)
     end, coords, true)
     
 end)
@@ -352,37 +344,42 @@ AddEventHandler('onResourceStart', function(resource)
     end
 end)
 
-RegisterNetEvent('jobs:client:ToggleNpc', function()
-    if QBCore.Functions.GetPlayerData().job.name == "tow" then
-        if CurrentTow ~= nil then
-            QBCore.Functions.Notify(Lang:t('error.finish_your_work'), "error")
-            return
-        end
-        NpcOn = not NpcOn
-        if NpcOn then
-            sendpopups(Lang:t('info.someone_called_tow'))
-            local randomLocation = getRandomVehicleLocation()
-            CurrentLocation.x = Config.Locations["towspots"][randomLocation].coords.x
-            CurrentLocation.y = Config.Locations["towspots"][randomLocation].coords.y
-            CurrentLocation.z = Config.Locations["towspots"][randomLocation].coords.z
-            CurrentLocation.model = Config.Locations["towspots"][randomLocation].model
-            CurrentLocation.id = randomLocation
-
-            CurrentBlip = AddBlipForCoord(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)
-            SetBlipColour(CurrentBlip, 3)
-            SetBlipRoute(CurrentBlip, true)
-            SetBlipRouteColour(CurrentBlip, 3)
-            JobStarted = true
-        else
-            if DoesBlipExist(CurrentBlip) then
-                RemoveBlip(CurrentBlip)
-                CurrentLocation = {}
-                CurrentBlip = nil
+RegisterNetEvent('an-towjob:client:ToggleNpc', function()
+    local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
+    if QBCore.Functions.GetPlate(vehicle) == globalplate then
+        if QBCore.Functions.GetPlayerData().job.name == "tow" then
+            if CurrentTow ~= nil then
+                QBCore.Functions.Notify(Lang:t('error.finish_your_work'), "error")
+                return
             end
-            JobStarted = false
-            VehicleSpawned = false
-            QBCore.Functions.DeleteVehicle(towablevehicle)
+            NpcOn = not NpcOn
+            if NpcOn then
+                sendpopups(Lang:t('info.someone_called_tow'))
+                local randomLocation = getRandomVehicleLocation()
+                CurrentLocation.x = Config.Locations["towspots"][randomLocation].coords.x
+                CurrentLocation.y = Config.Locations["towspots"][randomLocation].coords.y
+                CurrentLocation.z = Config.Locations["towspots"][randomLocation].coords.z
+                CurrentLocation.model = Config.Locations["towspots"][randomLocation].model
+                CurrentLocation.id = randomLocation
+
+                CurrentBlip = AddBlipForCoord(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z)
+                SetBlipColour(CurrentBlip, 3)
+                SetBlipRoute(CurrentBlip, true)
+                SetBlipRouteColour(CurrentBlip, 3)
+                JobStarted = true
+            else
+                if DoesBlipExist(CurrentBlip) then
+                    RemoveBlip(CurrentBlip)
+                    CurrentLocation = {}
+                    CurrentBlip = nil
+                end
+                JobStarted = false
+                VehicleSpawned = false
+                QBCore.Functions.DeleteVehicle(towablevehicle)
+            end
         end
+    else
+        QBCore.Functions.Notify("You need a flatbed from the impound.", "error")
     end
 end)
 
@@ -422,7 +419,7 @@ RegisterNetEvent('an-tow:client:TowVehicle', function()
                                 flags = 16,
                             }, {}, {}, function() -- Done
                                 StopAnimTask(PlayerPedId(), "mini@repair", "fixing_a_ped", 1.0)
-                                if JobStarted then
+                                if JobStarted and NpcOn then
                                     sendpopups(Lang:t('info.take_vehicle_impound_lot'))
                                 else
                                     sendpopups('Take Car Back To Station To Depot')
@@ -553,7 +550,7 @@ function RunWorkThread()
 
                 if NpcOn and CurrentLocation ~= nil and next(CurrentLocation) ~= nil then
                     if not VehicleSpawned then
-                        Wait(Config.waitbetweenjobs + 3 * 1000)
+                        Wait(13 * 1000)
                         VehicleSpawned = true
                         QBCore.Functions.SpawnVehicle(CurrentLocation.model, function(veh)
                             exports[Config.fuel]:SetFuel(veh, 0.0)
@@ -562,8 +559,6 @@ function RunWorkThread()
                             end
                             towablevehicle = veh
                         end, CurrentLocation, true)
-                        print(CurrentLocation.model)
-                        
                     end
                     sleep = 5
                 end
@@ -585,12 +580,12 @@ end)
 RegisterNetEvent("an-tow:pay")
 AddEventHandler("an-tow:pay", function()
     if JobsDone > 0 then
-    RemoveBlip(CurrentBlip)
-    TriggerServerEvent("an-tow:server:getpaid", JobsDone)
-    JobsDone = 0
-    NpcOn = false
+        RemoveBlip(CurrentBlip)
+        TriggerServerEvent("an-tow:server:getpaid", JobsDone)
+        JobsDone = 0
+        NpcOn = false
     else
-    QBCore.Functions.Notify(Lang:t('error.no_work_done'), "error", 5000)
+        QBCore.Functions.Notify(Lang:t('error.no_work_done'), "error", 5000)
     end
 end)
 

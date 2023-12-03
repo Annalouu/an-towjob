@@ -56,14 +56,11 @@ RegisterNetEvent('an-tow:server:getpaid', function(drops)
         bonus = math.ceil((DropPrice / 10) * 12)
     end
     local price = (DropPrice * drops) + bonus
-    local payment = price 
-
-    Player.Functions.AddJobReputation(1)
+    local payment = price
     Player.Functions.AddMoney("bank", payment, "tow-salary")
-    TriggerClientEvent('an-tow:client:sendemail', src, Lang:t('success.you_got_paid', {payment = payment}), 'success')
-    
+    TriggerClientEvent('an-tow:client:sendemail', src, Lang:t('success.you_got_paid', {payment = payment}), 'success')  
 end)
 
-QBCore.Commands.Add("npc", Lang:t('info.toggle_npc_job'), {}, false, function(source, args)
-	TriggerClientEvent("jobs:client:ToggleNpc", source)
+QBCore.Commands.Add("starttowing", Lang:t('info.toggle_npc_job'), {}, false, function(source, args)
+	TriggerClientEvent("an-towjob:client:ToggleNpc", source)
 end)

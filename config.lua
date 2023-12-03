@@ -5,8 +5,7 @@ Config.Phone = 'qb' -- qb / gks / qs
 -- Enable if using renewed's qb-phone
 Config.reqTow = false
 Config.dropprice = math.random(1000,2000) -- Price of each dropoff
-Config.waitbetweenjobs = 10 -- in seconds
-Config.fuel = 'cdn-fuel'
+Config.fuel = 'cdn-fuel' -- your fuel script.
 
 Config.Vehicles = {
     ["flatbed"] = "Flatbed",
@@ -14,8 +13,6 @@ Config.Vehicles = {
 }
 Config.PedHash = 's_m_m_gaffer_01'
 Config.PedPos = vector4(-211.92, -1163.54, 23.05, 193.95)
-Config.payPedHash = 'ig_floyd'
-Config.payPedPos = vector4(-193.34, -1162.34, 23.67, 274.05)
 Config.Locations = {
     ["main"] = {
         label = "Towing HQ",

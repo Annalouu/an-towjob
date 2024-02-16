@@ -24,6 +24,7 @@
 - Drag and drop to your resource folder
 - ensure an-towjob
 - Setjob ID tow 0
+- change or add a trigger to your Radialmenu for the towjob, the trigger in question is: an-towjob:client:ToggleNpc
 - Enjoy
 
 # dependency 
